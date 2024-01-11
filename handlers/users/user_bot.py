@@ -1,10 +1,12 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentTypes
+import asyncpg
 
-from loader import dp
+from loader import dp, db, bot
 from states.states import user_states
 from keyboards.inline.confirmation import confirmation_keyboard
+from data.config import ADMINS
 
 # VALUE STATE
 
@@ -99,7 +101,11 @@ async def set_val(message: types.Message):
 
 @dp.message_handler(state=user_states.set_key, content_types=ContentTypes.TEXT)
 async def set_text(message: types.Message, state: FSMContext):
-    await state.update_data({"key": message.text})
+    telegram_id = message.from_user.id
+    await state.update_data({
+        "key": message.text,
+        "telegram_id": telegram_id
+    })
     await message.answer("Endi tasdiqlang!", reply_markup=confirmation_keyboard)
     await user_states.confirmation.set()
 
@@ -121,6 +127,24 @@ async def confirm_callback(call: types.CallbackQuery):
 
 @dp.callback_query_handler(state=user_states.confirmation, text="confirm")
 async def confirm_callback(call: types.CallbackQuery, state: FSMContext):
+    info = await state.get_data()
+    key = info.get("key")
+    value = info.get("value")
+    telegram_id = info.get("telegram_id")
+
+    try:
+        storage = await db.add_info(
+            telegram_id=telegram_id,
+            key_set=key,
+            value_set=value
+        )
+    except asyncpg.exceptions.UniqueViolationError:
+        storage = await db.select_info(telegram_id=telegram_id)
+
+    count = await db.count_info_rows()
+    msg = f"Key '{storage[1]}' from id '{storage[0]}' has been added to storage! We now have {count} rows."
+    await bot.send_message(chat_id=ADMINS[0], text=msg)
+
     await call.message.answer("Bo'ldi hammasi tayyor. Endi siz topa olasiz")
     await call.answer(cache_time=60)
     await user_states.set_val.set()
