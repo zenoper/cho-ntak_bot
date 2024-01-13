@@ -12,7 +12,10 @@ from data.config import ADMINS
 
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.TEXT)
 async def set_val(message: types.Message, state: FSMContext):
-    await state.update_data({"value": message.text})
+    await state.update_data({
+        "value": message.text,
+        "type": "text"
+    })
     await message.answer(message.text)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -21,7 +24,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.AUDIO)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.audio.file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "audio"})
     await message.reply_audio(value)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -30,7 +33,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.DOCUMENT)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.document.file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "document"})
     await message.reply_document(value)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -39,7 +42,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.ANIMATION)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.animation.file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "animation"})
     await message.reply_animation(value)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -58,7 +61,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.VOICE)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.voice.file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "voice"})
     await message.reply_voice(value)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -67,7 +70,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.LOCATION)
 async def set_val(message: types.Message, state: FSMContext):
     value = f"{message.location.latitude}" + "&" + f"{message.location.longitude}"
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "location"})
     lat_long = value.split("&")
     await message.reply_location(latitude=lat_long[0], longitude=lat_long[1])
     await message.answer("Endi kalit so'z yuboring!")
@@ -77,7 +80,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.PHOTO)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.photo[-1].file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "photo"})
     await message.reply_photo(value, caption="Here is your photo")
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -86,7 +89,7 @@ async def set_val(message: types.Message, state: FSMContext):
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.STICKER)
 async def set_val(message: types.Message, state: FSMContext):
     value = message.sticker.file_id
-    await state.update_data({"value": value})
+    await state.update_data({"value": value, "type": "sticker"})
     await message.reply_sticker(value)
     await message.answer("Endi kalit so'z yuboring!")
     await user_states.set_key.set()
@@ -131,15 +134,17 @@ async def confirm_callback(call: types.CallbackQuery, state: FSMContext):
     key = info.get("key")
     value = info.get("value")
     telegram_id = info.get("telegram_id")
+    type = info.get("type")
 
     try:
         storage = await db.add_info(
             telegram_id=telegram_id,
             key_set=key,
-            value_set=value
+            value_set=value,
+            data_type=type
         )
     except asyncpg.exceptions.UniqueViolationError:
-        storage = await db.select_info(telegram_id=telegram_id)
+        storage = await db.select_row(telegram_id=telegram_id)
 
     count = await db.count_info_rows()
     msg = f"Key '{storage[1]}' from id '{storage[0]}' has been added to storage! We now have {count} rows."

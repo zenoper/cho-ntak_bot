@@ -92,7 +92,8 @@ class Database:
         CREATE TABLE IF NOT EXISTS Storage (
         telegram_id BIGINT NOT NULL,
         key_set VARCHAR(255) NOT NULL,
-        value_set VARCHAR(255) NOT NULL
+        value_set VARCHAR(255) NOT NULL,
+        data_type VARCHAR(255) NOT NULL
         );
         """
         await self.execute(sql, execute=True)
@@ -105,9 +106,10 @@ class Database:
         ])
         return sql, tuple(parameters.values())
 
-    async def add_info(self, telegram_id, key_set, value_set):
-        sql = "INSERT INTO Storage (telegram_id, key_set, value_set) VALUES($1, $2, $3) returning *"
-        return await self.execute(sql, telegram_id, key_set, value_set, fetchrow=True)
+    async def add_info(self, telegram_id, key_set, value_set, data_type):
+        sql = "INSERT INTO Storage (telegram_id, key_set, value_set, data_type) VALUES($1, $2, $3, $4) returning *"
+        return await self.execute(sql, telegram_id, key_set, value_set, data_type, fetchrow=True)
+
 
     async def select_all_info(self):
         sql = "SELECT * FROM Storage"
@@ -122,6 +124,9 @@ class Database:
         sql = "SELECT * FROM Storage WHERE telegram_id = $1 AND key_set = $2"
         return await self.execute(sql, telegram_id, key_set, fetchrow=True)
 
+    async def select_rows(self, telegram_id):
+        sql = "SELECT * FROM Storage WHERE telegram_id = $1"
+        return await self.execute(sql, telegram_id, fetch=True)
 
     async def count_info_rows(self):
         sql = "SELECT COUNT(*) FROM Storage"
