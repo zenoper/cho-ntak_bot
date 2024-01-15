@@ -13,6 +13,7 @@ def generate_unique_id():
 
 @dp.inline_handler(state=user_states.set_key)
 @dp.inline_handler(state=user_states.confirmation)
+@dp.inline_handler(state=user_states.start)
 @dp.inline_handler(state=user_states.set_val)
 async def inline_handler(query: types.InlineQuery):
     telegram_id = query.from_user.id
@@ -102,6 +103,7 @@ async def inline_handler(query: types.InlineQuery):
 
     else:
         rows = await db.select_rows(telegram_id=telegram_id)
+        print(rows)
         if rows:
             results = []
             for row in rows:
@@ -159,4 +161,5 @@ async def inline_handler(query: types.InlineQuery):
                         id=generate_unique_id(),
                         sticker_file_id=row[2]
                     ),)
+            print(results)
             await query.answer(results, cache_time=0)

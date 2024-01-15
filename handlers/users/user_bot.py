@@ -1,12 +1,24 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import ContentTypes
+from aiogram.types import ContentTypes, ReplyKeyboardRemove, InputFile
 import asyncpg
 
 from loader import dp, db, bot
 from states.states import user_states
 from keyboards.inline.confirmation import confirmation_keyboard
 from data.config import ADMINS
+
+# ADD FILE
+
+@dp.message_handler(text="Qo'shish +", state=user_states.start)
+async def send_welcome(message: types.Message):
+    await message.answer("Istagan fayl turini menga jo'nating...", reply_markup=ReplyKeyboardRemove())
+    await user_states.set_val.set()
+
+
+@dp.message_handler(state=user_states.start, content_types=types.ContentTypes.ANY)
+async def send_welcome(message: types.Message):
+    await message.answer("Iltimos, <b>qo'shish</b> tugmasini bosing. ")
 
 # VALUE STATE
 
@@ -17,7 +29,7 @@ async def set_val(message: types.Message, state: FSMContext):
         "type": "text"
     })
     await message.answer(message.text)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring! \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -26,7 +38,7 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.audio.file_id
     await state.update_data({"value": value, "type": "audio"})
     await message.reply_audio(value)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -35,7 +47,7 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.document.file_id
     await state.update_data({"value": value, "type": "document"})
     await message.reply_document(value)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -44,7 +56,7 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.animation.file_id
     await state.update_data({"value": value, "type": "animation"})
     await message.reply_animation(value)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -63,7 +75,7 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.voice.file_id
     await state.update_data({"value": value, "type": "voice"})
     await message.reply_voice(value)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -73,7 +85,7 @@ async def set_val(message: types.Message, state: FSMContext):
     await state.update_data({"value": value, "type": "location"})
     lat_long = value.split("&")
     await message.reply_location(latitude=lat_long[0], longitude=lat_long[1])
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -82,7 +94,7 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.photo[-1].file_id
     await state.update_data({"value": value, "type": "photo"})
     await message.reply_photo(value, caption="Here is your photo")
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
@@ -91,13 +103,13 @@ async def set_val(message: types.Message, state: FSMContext):
     value = message.sticker.file_id
     await state.update_data({"value": value, "type": "sticker"})
     await message.reply_sticker(value)
-    await message.answer("Endi kalit so'z yuboring!")
+    await message.answer("Endi kalit so'z yuboring!  \n\nAynan shu kalit so'z orqali bu faylni chatda jo'natasiz. Shuning uchun, kalit so'zni eslab qoling!")
     await user_states.set_key.set()
 
 
 @dp.message_handler(state=user_states.set_val, content_types=ContentTypes.ANY)
 async def set_val(message: types.Message):
-    await message.answer("Xohlagan narsangizni jo'nating! photo, text, video, document. Farqi yo'q")
+    await message.answer("Istagan fayl turini menga jo'nating...")
 
 
 # KEY STATE
@@ -115,7 +127,7 @@ async def set_text(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=user_states.set_key, content_types=ContentTypes.ANY)
 async def set_text(message: types.Message):
-    await message.answer("Kalit so'z faqatgina text bo'la oladi halos!")
+    await message.answer("Kalit so'z faqatgina text bo'lishi mumkin halos! \n\nItimos, faqatgina tekst jo'nating!")
 
 
 
@@ -123,7 +135,7 @@ async def set_text(message: types.Message):
 
 @dp.callback_query_handler(state=user_states.confirmation, text="edit")
 async def confirm_callback(call: types.CallbackQuery):
-    await call.message.answer("Xohlagan narsangizni jo'nating! photo, text, video, document. Farqi yo'q")
+    await call.message.answer("Istagan fayl turini menga jo'nating...")
     await call.answer(cache_time=60)
     await user_states.set_val.set()
 
@@ -153,4 +165,10 @@ async def confirm_callback(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer("Bo'ldi hammasi tayyor. Endi siz topa olasiz")
     await call.answer(cache_time=60)
     await user_states.set_val.set()
+
+
+@dp.message_handler(state=user_states.confirmation, content_types=types.ContentTypes.ANY)
+async def confirm_callback(message: types.Message):
+    await message.answer("Iltimos, tugmalardan biri bosing.", reply_markup=confirmation_keyboard)
+
 

@@ -132,8 +132,9 @@ class Database:
         sql = "SELECT COUNT(*) FROM Storage"
         return await self.execute(sql, fetchval=True)
 
-    async def delete_info(self):
-        await self.execute("DELETE FROM Storage WHERE TRUE", execute=True)
+    async def delete_info(self, telegram_id, key_set):
+        query = "DELETE FROM Storage WHERE telegram_id = $1 AND key_set = $2"
+        await self.execute(query, telegram_id, key_set, execute=True)
 
     async def drop_info(self):
         await self.execute("DROP TABLE Storage", execute=True)
