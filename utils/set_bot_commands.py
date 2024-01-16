@@ -6,7 +6,7 @@ async def set_default_commands(dp):
         [
             types.BotCommand("start", "Botni ishga tushurish"),
             types.BotCommand("help", "Yordam"),
-            types.BotCommand("add", "Yangi fayl qo'shish"),
-            types.BotCommand("delete", "Faylni o'chirish")
+            types.BotCommand("add", "Yangi ma'lumot qo'shish"),
+            types.BotCommand("delete", "Ma'lumotni o'chirish")
         ]
     )

@@ -10,7 +10,7 @@ from keyboards.default import add
 
 @dp.message_handler(CommandStart(), state="*")
 async def bot_start(message: types.Message):
-    await message.answer(f"Assalamu alaykum, {message.from_user.full_name}!")
+    await message.answer(f"Assalamu alaykum, {message.from_user.full_name}! 🎉")
     fullname = message.from_user.full_name
     username = message.from_user.username
     telegram_id = message.from_user.id
@@ -27,6 +27,6 @@ async def bot_start(message: types.Message):
     msg = f"User '{user[1]}' has been added to User's database! We now have {count} users."
     await bot.send_message(chat_id=ADMINS[0], text=msg)
 
-    await message.answer("Cho'ntak bot orqali siz har qanday faylni saqlab, uni telegramdagi ixtiyoriy chatga tezlik bilan jo'natish imkoniga ega bo'lasiz! \n\nFayl qo'shish uchun pastdagi 'qo\'shish' tugmasini bosing va kalit so'z bering.", reply_markup=add.add_file)
+    await message.answer("<b>Cho'ntak bot</b> orqali siz har qanday ma'lumotni saqlab, uni telegramdagi ixtiyoriy chatga tezlik bilan jo'natish imkoniga ega bo'lasiz! \n\nMa'lumot qo'shish uchun pastdagi <b>'Qo\'shish'</b> tugmasini bosing va kalit so'z bering.", reply_markup=add.add_file)
     await user_states.start.set()
 

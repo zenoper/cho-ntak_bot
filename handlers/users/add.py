@@ -7,5 +7,5 @@ from states.states import user_states
 
 @dp.message_handler(Command(["add"]), state="*")
 async def add(message: types.Message):
-    await message.answer("Istagan fayl turini menga jo'nating...", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("Istagan ma'lumot turini menga jo'nating...", reply_markup=types.ReplyKeyboardRemove())
     await user_states.set_val.set()
