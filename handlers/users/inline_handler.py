@@ -1,8 +1,9 @@
 from aiogram import types
-from loader import dp, db, bot
+from loader import dp, db
 
 from data.config import ADMINS
-from states.states import user_states
+from states.states import user_states, delete_states
+from keyboards.inline.confirmation import link, link_add
 
 import uuid
 
@@ -11,7 +12,10 @@ def generate_unique_id():
     return str(uuid.uuid4())
 
 
+@dp.inline_handler()
 @dp.inline_handler(state=user_states.set_key)
+@dp.inline_handler(state=delete_states.delete)
+@dp.inline_handler(state=delete_states.select)
 @dp.inline_handler(state=user_states.confirmation)
 @dp.inline_handler(state=user_states.start)
 @dp.inline_handler(state=user_states.set_val)
@@ -46,7 +50,8 @@ async def inline_handler(query: types.InlineQuery):
                         id=generate_unique_id(),
                         title=row[1],  # Set the title of the document
                         document_url=row[2],  # Set the URL of the document file
-                        mime_type='application/pdf'
+                        mime_type='application/pdf',
+                        thumb_url=row[2]
                     ),
                 ]
                 await query.answer(results, cache_time=0)
@@ -57,7 +62,6 @@ async def inline_handler(query: types.InlineQuery):
                         title=row[1],  # Set the title of the animation
                         gif_url=row[2],
                         thumb_url=row[2]
-
                     ),
                 ]
                 await query.answer(results, cache_time=0)
@@ -76,7 +80,8 @@ async def inline_handler(query: types.InlineQuery):
                         id=generate_unique_id(),
                         title=row[1],  # Set the title of the photo
                         photo_url=row[2],  # Set the URL of the photo file
-                        thumb_url=row[2]
+                        thumb_url=row[2],
+                        input_message_content=types.InputTextMessageContent("Ok")
                     ),
                 ]
                 await query.answer(results, cache_time=0)
@@ -100,6 +105,8 @@ async def inline_handler(query: types.InlineQuery):
                     ),
                 ]
                 await query.answer(results, cache_time=0)
+        else:
+            await query.answer([types.InlineQueryResultArticle(id=generate_unique_id(), title="Siz @chontak_bot ga bunday ma'lumot qo'shmagansiz!", url="https://t.me/chontak_bot", input_message_content=types.InputTextMessageContent("@chontak_bot"), reply_markup=link_add, thumb_url="https://i.imgur.com/G36mSy0.png"),], cache_time=0)
 
     else:
         rows = await db.select_rows(telegram_id=telegram_id)
@@ -123,6 +130,7 @@ async def inline_handler(query: types.InlineQuery):
                         id=generate_unique_id(),
                         title=row[1],  # Set the title of the document
                         document_url=row[2],  # Set the URL of the document file
+                        thumb_url=row[2],
                         mime_type='application/pdf'
                     ),)
                 elif row[3] == "animation":
@@ -161,3 +169,5 @@ async def inline_handler(query: types.InlineQuery):
                         sticker_file_id=row[2]
                     ),)
             await query.answer(results, cache_time=0)
+        else:
+            await query.answer([types.InlineQueryResultArticle(id=generate_unique_id(), title="Siz @chontak_bot ga ma'lumot qo'shmagansiz!", url="https://t.me/chontak_bot", input_message_content=types.InputTextMessageContent("@chontak_bot"), reply_markup=link, thumb_url="https://i.imgur.com/G36mSy0.png"),], cache_time=0)

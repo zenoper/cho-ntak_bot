@@ -121,8 +121,8 @@ class Database:
         return await self.execute(sql, *parameters, fetchrow=True)
 
     async def select_row(self, telegram_id, key_set):
-        sql = "SELECT * FROM Storage WHERE telegram_id = $1 AND key_set = $2"
-        return await self.execute(sql, telegram_id, key_set, fetchrow=True)
+        sql = "SELECT * FROM Storage WHERE telegram_id = $1 AND key_set ILIKE $2"
+        return await self.execute(sql, telegram_id, f"%{key_set}%", fetchrow=True)
 
     async def select_rows(self, telegram_id):
         sql = "SELECT * FROM Storage WHERE telegram_id = $1"

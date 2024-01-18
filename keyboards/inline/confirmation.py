@@ -8,3 +8,19 @@ confirmation_keyboard = InlineKeyboardMarkup(
         ],
     ]
 )
+
+link = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="↪", url="https://t.me/chontak_bot"),
+        ],
+    ]
+)
+
+link_add = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="↪", url="https://t.me/chontak_bot/add"),
+        ],
+    ]
+)
