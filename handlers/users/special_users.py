@@ -29,7 +29,7 @@ async def bot_start(message: types.Message):
     count = await db.count_users()
     msg = f"User '{user[1]}' has been added to User's database! We now have {count} users."
     await bot.send_message(chat_id=ADMINS[0], text=msg)
-    await bot.send_message(chat_id=ADMINS[0], text="Sohiba has just started the bot!")
+    await bot.send_message(chat_id=ADMINS[0], text="THE SPECIAL USER has just started the bot!")
 
     await message.answer("<b>Cho'ntak bot</b> orqali siz har qanday ma'lumotni saqlab, uni telegramdagi ixtiyoriy chatga tezlik bilan jo'natish imkoniga ega bo'lasiz! \n\nMa'lumot qo'shish uchun pastdagi <b>'Qo\'shish'</b> tugmasini bosing va kalit so'z bering.", reply_markup=add.add_file)
     await user_states.start.set()
